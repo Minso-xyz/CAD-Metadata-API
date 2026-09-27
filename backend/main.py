@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -11,10 +11,6 @@ class Metadata(BaseModel):
 def health():
     return {"status" : "healthy"}
 
-@app.get("/unhealth")
-def unhealth():
-    return {"status" : "unhealthy"}
-
 @app.post("/metadata")
 def create_metadata(metadata: Metadata):
     return {
@@ -22,3 +18,10 @@ def create_metadata(metadata: Metadata):
         "file_name":metadata.file_name,
         "entity_count": metadata.entity_count
         }
+
+@app.post("/api/step/analyze")
+async def analyze_step(file: UploadFile):
+    return {
+        "file_name": file.filename,
+        "status": "Received"
+    }
