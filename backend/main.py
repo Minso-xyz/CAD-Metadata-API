@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
+import tempfile
+import os
 
 app = FastAPI()
 
@@ -28,7 +30,16 @@ async def analyze_step(file: UploadFile):
             detail="ONLY STEP files (.step, .stp) are supported."
         )
     
+    content = await file.read()
+
+    temp_dir = tempfile.gettempdir()
+    temp_file_path = os.path.join(temp_dir, file.filename)
+
+    with open(temp_file_path, "wb") as temp_file:   # binary write mode
+        temp_file.write(content)
+    
     return {
         "file_name": file.filename,
-        "status": "Received"
+        "status": "Received",
+        "temp_path": temp_file_path
     }
