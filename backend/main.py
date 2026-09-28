@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -21,6 +21,13 @@ def create_metadata(metadata: Metadata):
 
 @app.post("/api/step/analyze")
 async def analyze_step(file: UploadFile):
+
+    if not file.filename.lower().endswith((".step", ".stp")):
+        raise HTTPException(
+            status_code=400,
+            detail="ONLY STEP files (.step, .stp) are supported."
+        )
+    
     return {
         "file_name": file.filename,
         "status": "Received"
